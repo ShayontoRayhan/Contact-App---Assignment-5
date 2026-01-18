@@ -29,6 +29,6 @@ Files of interest: src/context/ContactContext.jsx, src/components
 
 ### Name : Shayonto Rayhan
 
-### Email: rayhanshayonto@gmaail.com
+### Email: rayhanshayonto@gmail.com
 
 [ Live url](http://localhost:5173)
