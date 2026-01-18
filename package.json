@@ -1,0 +1,22 @@
+{
+  "name": "contact-app-assignment5",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"json-server --watch db.json --port 3001\" \"vite\"",
+    "build": "vite build",
+    "serve": "vite preview",
+    "start-json": "json-server --watch db.json --port 3001"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "^6.30.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.0.0",
+    "concurrently": "8.2.0",
+    "json-server": "0.17.3",
+    "vite": "^5.4.21"
+  }
+}

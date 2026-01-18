@@ -1,0 +1,51 @@
+{
+  "contacts": [
+    {
+      "id": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@example.com",
+      "phone": "01744748487"
+    },
+    {
+      "id": 2,
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "email": "jane@example.com",
+      "phone": "01987654321"
+    },
+    {
+      "firstName": "Shayonto",
+      "lastName": "Rayhan",
+      "email": "rayhanshayonto@gmail.com",
+      "phone": "01309029431",
+      "address": "Pankouri, 20 Chamelibagh, Shantinagar, Dhaka",
+      "id": 3,
+      "dob": "2005-02-01"
+    },
+    {
+      "firstName": "Saidur",
+      "lastName": "Rahman",
+      "email": "saidur@gmail.com",
+      "phone": "01309029432",
+      "address": "Kurigram",
+      "id": 4
+    },
+    {
+      "firstName": "Sabit",
+      "lastName": "Ahmed",
+      "email": "sabit@gmail.com",
+      "phone": "01309029434",
+      "address": "Old Dhaka",
+      "id": 5
+    },
+    {
+      "firstName": "Subrata",
+      "lastName": "Baishnab",
+      "email": "subrata@gmail.com",
+      "phone": "01309329431",
+      "address": "Chattagram",
+      "id": 6
+    }
+  ]
+}
