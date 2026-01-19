@@ -31,4 +31,4 @@ Files of interest: src/context/ContactContext.jsx, src/components
 
 ### Email: rayhanshayonto@gmail.com
 
-[ Live url](http://localhost:5173)
+[ Live url](https://fluffy-kataifi-7986f8.netlify.app/)
