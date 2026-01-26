@@ -30,8 +30,14 @@ export default function AddContact(){
     const errs = validate(form)
     setErrors(errs)
     if(Object.keys(errs).length > 0) return
-    await addContact(form)
-    navigate('/')
+    try {
+      await addContact(form)
+      // Wait a moment for the data to sync
+      await new Promise(resolve => setTimeout(resolve, 500))
+      navigate('/')
+    } catch (err) {
+      console.error('Failed to add contact:', err)
+    }
   }
 
   const isInvalid = Object.keys(errors).length > 0 || !form.firstName || !form.email

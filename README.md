@@ -4,5 +4,5 @@
 
 ### Email: rayhanshayonto@gmail.com
 
-[Live url](https://wonderful-melomakarona-ef95d5.netlify.app/)
+[Live url](https://peaceful-fairy-dd7aa7.netlify.app//)
 

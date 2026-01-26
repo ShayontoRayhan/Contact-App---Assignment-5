@@ -1,9 +1,49 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
 const ContactContext = createContext()
-// JSONBin API endpoint
-const BIN_ID = '6976f31ad0ea881f4085dda6'
-const API = `https://api.jsonbin.io/v3/b/${BIN_ID}`
+const STORAGE_KEY = 'contacts_data'
+
+const DEFAULT_CONTACTS = [
+  {
+    "id": 1,
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "phone": "01744748487"
+  },
+  {
+    "id": 2,
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "email": "jane@example.com",
+    "phone": "01987654321"
+  },
+  {
+    "id": 3,
+    "firstName": "Shayonto",
+    "lastName": "Rayhan",
+    "email": "rayhanshayonto@gmail.com",
+    "phone": "01309029431",
+    "address": "Pankouri, 20 Chamelibagh, Shantinagar, Dhaka",
+    "dob": "2005-02-01"
+  },
+  {
+    "id": 4,
+    "firstName": "Saidur",
+    "lastName": "Rahman",
+    "email": "saidur@gmail.com",
+    "phone": "01309029432",
+    "address": "Kurigram"
+  },
+  {
+    "id": 5,
+    "firstName": "Sabit",
+    "lastName": "Ahmed",
+    "email": "sabit@gmail.com",
+    "phone": "01309029434",
+    "address": "Old Dhaka"
+  }
+]
 
 export function useContacts(){ return useContext(ContactContext) }
 
@@ -18,29 +58,32 @@ export function ContactProvider({ children }){
   async function fetchContacts(){
     setLoading(true)
     try{
-      const res = await fetch(API)
-      const data = await res.json()
-      setContacts(data.record.contacts)
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if(saved){
+        const data = JSON.parse(saved)
+        setContacts(data)
+      } else {
+        // Initialize with default contacts if first time
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CONTACTS))
+        setContacts(DEFAULT_CONTACTS)
+      }
     }catch(err){
       console.error('Failed to fetch contacts', err)
+      setContacts(DEFAULT_CONTACTS)
     }finally{ setLoading(false) }
   }
 
   async function addContact(contact){
     try{
-      const res = await fetch(API)
-      const data = await res.json()
-      const currentContacts = data.record.contacts
-      const newId = Math.max(...currentContacts.map(c => c.id), 0) + 1
+      const saved = localStorage.getItem(STORAGE_KEY) || '[]'
+      const currentContacts = JSON.parse(saved)
+      const newId = currentContacts.length > 0 ? Math.max(...currentContacts.map(c => c.id || 0)) + 1 : 1
       const newContact = { ...contact, id: newId }
-      const updatedData = { contacts: [...currentContacts, newContact] }
+      const updatedData = [...currentContacts, newContact]
       
-      await fetch(API, { 
-        method: 'PUT', 
-        headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify(updatedData) 
-      })
-      await fetchContacts()
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData))
+      setContacts(updatedData)
+      console.log('Contact added:', newContact)
       return newContact
     }catch(err){
       console.error('Failed to add contact', err)
@@ -50,19 +93,13 @@ export function ContactProvider({ children }){
 
   async function updateContact(id, updates){
     try{
-      const res = await fetch(API)
-      const data = await res.json()
-      const currentContacts = data.record.contacts
+      const saved = localStorage.getItem(STORAGE_KEY) || '[]'
+      const currentContacts = JSON.parse(saved)
       const updatedContacts = currentContacts.map(c => c.id === id ? { ...c, ...updates, id } : c)
-      const updatedData = { contacts: updatedContacts }
       
-      await fetch(API, { 
-        method: 'PUT', 
-        headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify(updatedData) 
-      })
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedContacts))
       setContacts(updatedContacts)
-      await fetchContacts()
+      console.log('Contact updated:', id)
       return { ...updates, id }
     }catch(err){
       console.error('Failed to update contact', err)
@@ -72,18 +109,13 @@ export function ContactProvider({ children }){
 
   async function deleteContact(id){
     try{
-      const res = await fetch(API)
-      const data = await res.json()
-      const currentContacts = data.record.contacts
+      const saved = localStorage.getItem(STORAGE_KEY) || '[]'
+      const currentContacts = JSON.parse(saved)
       const filteredContacts = currentContacts.filter(c => c.id !== id)
-      const updatedData = { contacts: filteredContacts }
       
-      await fetch(API, { 
-        method: 'PUT', 
-        headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify(updatedData) 
-      })
-      await fetchContacts()
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredContacts))
+      setContacts(filteredContacts)
+      console.log('Contact deleted:', id)
     }catch(err){
       console.error('Failed to delete contact', err)
       throw err
