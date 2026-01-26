@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
 const ContactContext = createContext()
-const API = 'http://localhost:3001/contacts'
+// JSONBin API endpoint
+const BIN_ID = '6976f31ad0ea881f4085dda6'
+const API = `https://api.jsonbin.io/v3/b/${BIN_ID}`
 
 export function useContacts(){ return useContext(ContactContext) }
 
@@ -18,42 +20,74 @@ export function ContactProvider({ children }){
     try{
       const res = await fetch(API)
       const data = await res.json()
-      setContacts(data)
+      setContacts(data.record.contacts)
     }catch(err){
       console.error('Failed to fetch contacts', err)
     }finally{ setLoading(false) }
   }
 
   async function addContact(contact){
-    const res = await fetch(API, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(contact) })
-    const saved = await res.json()
-    // re-sync list from server to avoid any local-state drift
-    await fetchContacts()
-    return saved
+    try{
+      const res = await fetch(API)
+      const data = await res.json()
+      const currentContacts = data.record.contacts
+      const newId = Math.max(...currentContacts.map(c => c.id), 0) + 1
+      const newContact = { ...contact, id: newId }
+      const updatedData = { contacts: [...currentContacts, newContact] }
+      
+      await fetch(API, { 
+        method: 'PUT', 
+        headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify(updatedData) 
+      })
+      await fetchContacts()
+      return newContact
+    }catch(err){
+      console.error('Failed to add contact', err)
+      throw err
+    }
   }
 
   async function updateContact(id, updates){
-    const body = { ...updates, id }
-    console.log('Updating contact', id, body)
-    const res = await fetch(`${API}/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) })
-    if(!res.ok){
-      const text = await res.text().catch(()=>null)
-      const err = new Error(`Server responded ${res.status}: ${text}`)
+    try{
+      const res = await fetch(API)
+      const data = await res.json()
+      const currentContacts = data.record.contacts
+      const updatedContacts = currentContacts.map(c => c.id === id ? { ...c, ...updates, id } : c)
+      const updatedData = { contacts: updatedContacts }
+      
+      await fetch(API, { 
+        method: 'PUT', 
+        headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify(updatedData) 
+      })
+      setContacts(updatedContacts)
+      await fetchContacts()
+      return { ...updates, id }
+    }catch(err){
       console.error('Failed to update contact', err)
       throw err
     }
-    const updated = await res.json()
-    // optimistic local update so UI reflects change immediately
-    setContacts(prev => prev.map(c => c.id === id ? updated : c))
-    // try to re-fetch authoritative list, but don't fail the whole operation if fetch fails
-    try{ await fetchContacts() }catch(e){ console.warn('Re-fetch after update failed', e) }
-    return updated
   }
 
   async function deleteContact(id){
-    await fetch(`${API}/${id}`, { method: 'DELETE' })
-    // re-sync
-    await fetchContacts()
+    try{
+      const res = await fetch(API)
+      const data = await res.json()
+      const currentContacts = data.record.contacts
+      const filteredContacts = currentContacts.filter(c => c.id !== id)
+      const updatedData = { contacts: filteredContacts }
+      
+      await fetch(API, { 
+        method: 'PUT', 
+        headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify(updatedData) 
+      })
+      await fetchContacts()
+    }catch(err){
+      console.error('Failed to delete contact', err)
+      throw err
+    }
   }
 
   return (
